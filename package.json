@@ -5,5 +5,8 @@
   "main": "app.js",
   "author": "rokity <riccardo.amadio@studenti.unicam.it> alepacox <alessandro.pacini@studenti.unicam.it>",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "express": "^4.16.3"
+  }
 }
