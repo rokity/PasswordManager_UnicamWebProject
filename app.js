@@ -1,4 +1,5 @@
 var express = require('express');
+var sqlite3 = require('sqlite3').verbose();
 var app = express();
 
 var port = process.argv[2];
@@ -8,5 +9,5 @@ app.get('/', function (req, res) {
 });
 
 app.listen(port, function () {
-  console.log(`Example app listening on port ${port}!`);
+  console.log(`Dominkey server listening on port ${port}!`);
 });

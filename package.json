@@ -6,12 +6,13 @@
   "author": "rokity <riccardo.amadio@studenti.unicam.it> alepacox <alessandro.pacini@studenti.unicam.it>",
   "license": "MIT",
   "private": true,
-  "scripts":{
-   "start" : "node app.js 8000",
-   "dev" : "node app.js 3000"
+  "scripts": {
+    "start": "node app.js 8000",
+    "dev": "node app.js 3000"
   },
   "dependencies": {
     "express": "^4.16.3",
-    "nodemon": "^1.17.5"
+    "nodemon": "^1.17.5",
+    "sqlite3": "^4.0.1"
   }
 }
