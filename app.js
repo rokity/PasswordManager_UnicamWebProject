@@ -1,13 +1,32 @@
-var express = require('express');
+const Hapi = require('hapi');
 var sqlite3 = require('sqlite3').verbose();
-var app = express();
 
 var port = process.argv[2];
 
-app.get('/', function (req, res) {
-  res.send('Hello World!');
+const server=Hapi.server({
+  host:'localhost',
+  port:port
 });
 
-app.listen(port, function () {
-  console.log(`Dominkey server listening on port ${port}!`);
+server.route({
+  method:'GET',
+  path:'/',
+  handler:function(request,h) {
+      return'hello world';
+  }
 });
+
+async function start() {
+
+  try {
+      await server.start();
+  }
+  catch (err) {
+      console.log(err);
+      process.exit(1);
+  }
+
+  console.log('Server running at:', server.info.uri);
+};
+
+start();
