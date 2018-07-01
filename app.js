@@ -8,18 +8,15 @@ const server=Hapi.server({
   port:port
 });
 
-server.route({
-  method:'GET',
-  path:'/',
-  handler:function(request,h) {
-      return'hello world';
-  }
-});
+//Lista di routes del web-server
+const routes = require('./routes');
+//collegarle a Hapi
+server.route(routes);
 
 async function start() {
 
   try {
-      await server.start();
+       server.start();
   }
   catch (err) {
       console.log(err);
