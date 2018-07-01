@@ -6,7 +6,7 @@ module.exports = [
         handler: (req, res) => 
         {
             res.type = 'application/json';
-            return res.response(JSON.stringify({id:"testa di cazzo"}))
+            return res.response(JSON.stringify({id:"example-route"}))
             
         },
         options:{
