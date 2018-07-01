@@ -8,6 +8,12 @@ const server=Hapi.server({
   port:port
 });
 
+let db = new sqlite3.Database('./db/dominkey.db', (err) => {
+  if (err) {
+    console.error(err.message);
+  } else console.log('Connected to the Dominkey database.');
+});
+
 server.route({
   method:'GET',
   path:'/',
@@ -26,7 +32,7 @@ async function start() {
       process.exit(1);
   }
 
-  console.log('Server running at:', server.info.uri);
+  console.log('DominKey Server running at:', server.info.uri);
 };
 
 start();
