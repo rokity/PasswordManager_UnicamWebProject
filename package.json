@@ -7,11 +7,12 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "node app.js 8000",
-    "dev": "node app.js 3000"
+    "start": "nodemon app.js 8000",
+    "dev": "nodemon app.js 3000"
   },
   "dependencies": {
     "hapi": "^17.5.2",
+    "node-forge": "^0.7.5",
     "nodemon": "^1.17.5",
     "sqlite3": "^4.0.1"
   }

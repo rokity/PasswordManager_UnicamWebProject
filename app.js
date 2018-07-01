@@ -1,6 +1,5 @@
 const Hapi = require('hapi');
 var sqlite3 = require('sqlite3').verbose();
-
 var port = process.argv[2];
 
 const server=Hapi.server({
