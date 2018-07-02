@@ -29,15 +29,15 @@ module.exports = [
                         const sid = String(++uuid);
                         req.server.app.cache.set(sid, { account }, 0);
                         req.cookieAuth.set({ sid });
-                        return res.redirect('/home');
+                        return res.response(JSON.stringify({logged:true}));
                     }
                     else {
-
-                        return res.redirect('http://localhost:4200/login');
+                        return res.response(JSON.stringify({logged:false}));
+                        
                     }
                 });
             }).catch(function (err) {
-                return res.redirect('http://localhost:4200/login');
+                return res.response(JSON.stringify({logged:false}));
             })
         },
     },

@@ -6,7 +6,7 @@ module.exports = [
         path: '/api/register',
         config: {
             cors: true,
-            auth: { mode: 'optional' },            
+            auth: { mode: 'try' },            
         },
         handler: (req, res) => {
             console.log("ahsbdajsd")
