@@ -1,7 +1,7 @@
 
 module.exports = [
     {
-        method: 'GET',
+        method: 'POST',
         path: '/api/login',
         handler: (req, res) => 
         {
