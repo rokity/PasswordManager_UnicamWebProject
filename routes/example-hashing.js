@@ -15,7 +15,8 @@ module.exports = [
 ]
 
 let hashIt = (toHash) => {
+    var salt = forge.random.getBytesSync(256);
     var md = forge.md.sha512.create();
-    md.update(toHash);
+    md.update(toHash+salt);
     return md.digest().toHex();
 }
