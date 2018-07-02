@@ -15,7 +15,7 @@ pids
 lib-cov
 
 # Database
-db/dominkey.enc
+db/
 
 # Coverage directory used by tools like istanbul
 coverage
