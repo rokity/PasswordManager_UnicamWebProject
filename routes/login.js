@@ -1,15 +1,17 @@
 
+var uuid = 1;
 module.exports = [
     {
-        method: 'POST',
+        method: ['POST'],
         path: '/api/login',
-        handler: (req, res) => 
-        {
-            res.type = 'application/json';
-            return res.response(JSON.stringify({id:"example-route"}))
+        config: {
+            cors: true,
+            auth: { mode: 'try' },
+            plugins: { 'hapi-auth-cookie': { redirectTo: false } },
         },
-        options:{
-            cors :true            
-        }
-      },
+        handler: (req, res) => {
+            
+
+        },
+    },
 ]

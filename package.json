@@ -7,13 +7,14 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "install":"node setup/dir.js",
+    "install": "node setup/dir.js",
     "start": "nodemon app.js 8000",
     "dev": "nodemon app.js 3000"
   },
   "dependencies": {
     "bcrypt": "^2.0.1",
     "hapi": "^17.5.2",
+    "hapi-auth-cookie": "^9.0.0",
     "mkdirp": "^0.5.1",
     "node-forge": "^0.7.5",
     "nodemon": "^1.17.5",
