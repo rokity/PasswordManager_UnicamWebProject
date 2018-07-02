@@ -1,6 +1,6 @@
 var bcrypt = require('bcrypt');
 
-let uuid = 1;
+
 module.exports = [
     {
         method: ['POST'],
@@ -11,7 +11,6 @@ module.exports = [
             plugins: { 'hapi-auth-cookie': { redirectTo: false } },
         },
         handler: (req, res) => {
-            var account  = null;
             var email = req.payload.email;
             var masterkey = req.payload.masterkey;
             return new Promise((resolve, reject) => {
@@ -25,15 +24,15 @@ module.exports = [
             }).then((val) => {
                 return bcrypt.compare(masterkey, val).then((value) => {
                     if (value) {
-                        account = {email:email,__u:val};
-                        const sid = String(++uuid);
+                        var account = {email:email,masterkey:val};
+                        global.uuid = global.uuid+1;
+                        const sid = String(global.uuid);
                         req.server.app.cache.set(sid, { account }, 0);
                         req.cookieAuth.set({ sid });
                         return res.response(JSON.stringify({logged:true}));
                     }
                     else {
-                        return res.response(JSON.stringify({logged:false}));
-                        
+                        return res.response(JSON.stringify({logged:false}));                        
                     }
                 });
             }).catch(function (err) {

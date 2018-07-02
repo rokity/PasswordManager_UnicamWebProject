@@ -63,6 +63,7 @@ catch (error) {
 }
 
 //Global variables
+global.uuid = 1;
 global.sqlite= sqlite;
 global.Promise= Promise;
 

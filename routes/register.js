@@ -6,10 +6,9 @@ module.exports = [
         path: '/api/register',
         config: {
             cors: true,
-            auth: { mode: 'try' },            
+            auth: { mode: 'try' },                     
         },
         handler: (req, res) => {
-            console.log("ahsbdajsd")
             var name = req.payload.name;
             var surname = req.payload.surname;
             var email = req.payload.email;
@@ -35,11 +34,17 @@ module.exports = [
                         console.log("insert done with id", val)
                         var rows = global.sqlite.run(`SELECT * FROM User WHERE ID=${val}`);
                         console.log("row created", rows);
-                        return res.response(JSON.stringify("Registration done"))
+                        var account = {email:email,masterkey:val};
+                        global.uuid = global.uuid+1;
+                        const sid = String(global.uuid);
+                        req.server.app.cache.set(sid, { account }, 0);
+                        req.cookieAuth.set({ sid });
+                        return res.response(JSON.stringify({logged:true,mailUsed:false}));
                     }).catch(function(err){
-                        if (err.mailUtilizzata==true){
-                            return res.response(JSON.stringify("Mail already used"));
-                        } else throw err;
+                        if (err.mailUtilizzata==true)
+                            return res.response(JSON.stringify({mailUsed:true,logged:false}));
+                        else 
+                            return res.response(JSON.stringify({logged:false,mailUsed:false}));
                     })                
                 })
             })
