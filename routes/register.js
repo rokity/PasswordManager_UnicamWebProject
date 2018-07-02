@@ -6,7 +6,7 @@ const saltRounds = 10;
 module.exports = [
     {
         method: 'POST',
-        path: '/api/hashing/',
+        path: '/api/register',
         handler: (req, res) => {
             var name = req.payload.name;
             var surname = req.payload.surname;
