@@ -32,6 +32,7 @@ sqlite.run("CREATE TABLE IF NOT EXISTS User (ID INTEGER PRIMARY KEY AUTOINCREMEN
 // var rows = sqlite.run("SELECT * FROM User");
 // console.log(rows);
 global.sqlite= sqlite;
+global.Promise= Promise;
 
 
 start();
