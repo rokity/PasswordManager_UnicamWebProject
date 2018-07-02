@@ -1,4 +1,3 @@
-var sqlite = require('sqlite-cipher')
 var bcrypt = require('bcrypt');
 
 const saltRounds = 10;
@@ -6,7 +5,7 @@ const saltRounds = 10;
 module.exports = [
     {
         method: 'POST',
-        path: '/api/hashing/',
+        path: '/api/register',
         handler: (req, res) => {
             var name = req.payload.name;
             var surname = req.payload.surname;
@@ -15,7 +14,7 @@ module.exports = [
             return hashing(masterkey).then((value) => {
                 return new Promise((resolve,reject)=>
                 {
-                    sqlite.run("INSERT INTO User (NAME, SURNAME, EMAIL, MASTERKEY) VALUES ('" + name + "', '" + surname + "', '" + email + "', '" + value + "')", function (row) {
+                    global.sqlite.run(`INSERT INTO User (NAME, SURNAME, EMAIL, MASTERKEY) VALUES ('${name}', '${surname}', '${email}', '${value}')`, function (row) {
                         if (row.error)
                             reject(row.error)
                         else {
@@ -24,7 +23,7 @@ module.exports = [
                     });;
                 }).then((val) => {
                     console.log("insert done with id", val)
-                    var rows = sqlite.run(`SELECT * FROM User WHERE ID=${val}`);
+                    var rows = global.sqlite.run(`SELECT * FROM User WHERE ID=${val}`);
                     console.log("row created", rows);
                     return res.response(JSON.stringify("Good Job"))
                 }).catch(function(err){
