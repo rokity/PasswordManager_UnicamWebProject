@@ -62,6 +62,9 @@ catch (error) {
   console.error("error", error)
 }
 
+//Global variables
+global.sqlite= sqlite;
+global.Promise= Promise;
 
 
 start();
