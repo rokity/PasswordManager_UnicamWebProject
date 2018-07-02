@@ -29,8 +29,8 @@ async function start() {
 sqlite.connect('./db/dominkey.enc',/*psw*/ 'dominkey','aes-256-cbc');
 console.log('Connected to the Dominkey database.'); 
 sqlite.run("CREATE TABLE IF NOT EXISTS User (ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME VARCHAR(15) NOT NULL, SURNAME VARCHAR(15) NOT NULL, EMAIL VARCHAR(20) NOT NULL, MASTERKEY VARCHAR NOT NULL);");        
-var rows = sqlite.run("SELECT * FROM User");
-console.log(rows);
+// var rows = sqlite.run("SELECT * FROM User");
+// console.log(rows);
 
 
 start();
