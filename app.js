@@ -26,11 +26,16 @@ async function start() {
   console.log('DominKey Server running at:', server.info.uri);
 };
 //DB Initialization
-sqlite.connect('./db/dominkey.enc',/*psw*/ 'dominkey','aes-256-cbc');
-console.log('Connected to the Dominkey database.'); 
-sqlite.run("CREATE TABLE IF NOT EXISTS User (ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME VARCHAR(15) NOT NULL, SURNAME VARCHAR(15) NOT NULL, EMAIL VARCHAR(20) NOT NULL, MASTERKEY VARCHAR NOT NULL);");        
-// var rows = sqlite.run("SELECT * FROM User");
-// console.log(rows);
+try{
+  sqlite.connect('./db/dominkey.enc',/*psw*/ 'dominkey','aes-256-cbc');
+  console.log('Connected to the Dominkey database.'); 
+  sqlite.run("CREATE TABLE IF NOT EXISTS User (ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME VARCHAR(15) NOT NULL, SURNAME VARCHAR(15) NOT NULL, EMAIL VARCHAR(20) NOT NULL, MASTERKEY VARCHAR NOT NULL);");        
+}
+catch(error)
+{
+  console.error("error",error)
+}
+
 
 
 start();
