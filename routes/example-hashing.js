@@ -2,8 +2,6 @@ var sqlite = require('sqlite-cipher')
 var bcrypt = require('bcrypt');
 
 const saltRounds = 10;
-const myPlaintextPassword = 's0/\/\P4$$w0rD';
-const someOtherPlaintextPassword = 'not_bacon';
 
 module.exports = [
     {
@@ -29,6 +27,8 @@ module.exports = [
                     var rows = sqlite.run(`SELECT * FROM User WHERE ID=${val}`);
                     console.log("row created", rows);
                     return res.response(JSON.stringify("Good Job"))
+                }).catch(function(err){
+                    throw err;
                 })                
             })
         },
