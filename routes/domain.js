@@ -111,6 +111,35 @@ module.exports = [
                 })
             }
         }
+    },
+    {
+        method: ['DELETE'],
+        path: '/api/domain/delete',
+        config: {
+            cors: true,
+            auth: { mode: 'required' },
+            plugins: { 'hapi-auth-cookie': { redirectTo: false } },
+        },
+        handler: (req, res) => {
+            if (req.auth.isAuthenticated) {
+                const session = req.auth.credentials;
+                var domainID = req.payload.domainID;
+                return new Promise((resolve, reject) => {
+                    global.sqlite.run(`DELETE FROM Psw WHERE ID=('${domainID}')`, function (row) {
+                        if (row.error)
+                            reject(row.error);
+                        else {
+                            resolve(row);
+                        }
+                    });
+                }).then((row) => {
+                     return res.response(JSON.stringify("Deleted"));
+                }).catch(function (err) {
+                    console.log(err);
+                    return res.response(JSON.stringify("An error occurred"));
+                })
+            }
+        }
     }
 ]
 
