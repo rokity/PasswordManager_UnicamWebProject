@@ -104,7 +104,9 @@ module.exports = [
                         }
                     });
                 })}).then((row) => {
+                    if(row.length>0){
                      return res.response(JSON.stringify("Updated"));
+                    } else return res.response(JSON.stringify("Nothing to modify here"));
                 }).catch(function (err) {
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
@@ -134,6 +136,39 @@ module.exports = [
                     });
                 }).then((row) => {
                      return res.response(JSON.stringify("Deleted"));
+                }).catch(function (err) {
+                    console.log(err);
+                    return res.response(JSON.stringify("An error occurred"));
+                })
+            }
+        }
+    },
+    {
+        method: ['GET'],
+        path: '/api/domain/search',
+        config: {
+            cors: true,
+            auth: { mode: 'required' },
+            plugins: { 'hapi-auth-cookie': { redirectTo: false } },
+        },
+        handler: (req, res) => {
+            if (req.auth.isAuthenticated) {
+                const session = req.auth.credentials;
+                var domain = req.query.domain;
+                return new Promise((resolve, reject) => {
+                    global.sqlite.run(`SELECT * FROM Psw WHERE DOMAIN=('${domain}')`, function (row) {
+                        if (row.error)
+                            reject(row.error);
+                        else {
+                            resolve(row);
+                        }
+                    });
+                }).then((row) => {
+                     if(row.length>0){
+                        return decryptDom(session.id, row).then((decryptedRow) => {
+                            return res.response(decryptedRow);
+                        })
+                     } else return res.response(JSON.stringify("No password for this domain"))
                 }).catch(function (err) {
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
