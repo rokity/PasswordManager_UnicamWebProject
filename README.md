@@ -3,5 +3,8 @@ Backend side of Dominkey, website developed with the purpose of generating and s
 
 # Notes :
 * [Generate Password Library](https://github.com/brendanashworth/generate-password)
-* [Crypto Library AES256](https://github.com/JamesMGreene/node-aes256)
-* [pbkdf2 hashing](https://nodejs.org/api/crypto.html#crypto_crypto_pbkdf2_password_salt_iterations_keylen_digest_callback)
+* [Bcrypt](https://www.npmjs.com/package/bcrypt) 
+  Used to store and match securely masterkeys through this simple and slow hashing function.
+* [node-forge](https://www.npmjs.com/package/node-forge)
+  Used to generate user masterkey based passwords through pbkdf2 algorithm. Domains psw are encrypted through AES with that key, an iv and 
+  a salt, generated individually for each domain.
