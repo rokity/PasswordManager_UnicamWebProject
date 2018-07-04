@@ -3,7 +3,7 @@ var bcrypt = require('bcrypt');
 module.exports = [
     {
         method: 'POST',
-        path: '/api/register',
+        path: '/api/registation',
         config: {
             cors: true,
             auth: { mode: 'try' },

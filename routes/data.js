@@ -3,8 +3,8 @@ var forge = require('node-forge');
 
 module.exports = [
     {
-        method: ['POST', 'GET'],
-        path: '/api/domain',
+        method: ['POST'],
+        path: '/api/domain/add',
         config: {
             cors: true,
             auth: { mode: 'required' },
@@ -13,7 +13,6 @@ module.exports = [
         handler: (req, res) => {
             if (req.auth.isAuthenticated) {
                 const session = req.auth.credentials;
-                if (req.method === 'post'){
                     var domain = req.payload.domain;
                     var psw = req.payload.psw;
                     return new Promise((resolve,reject)=>
@@ -43,7 +42,22 @@ module.exports = [
                             return res.response(JSON.stringify({DomainAdded:false, domainAlreadyInserted:false}));
                             }
                         })
-                } else {
+              }
+        },
+        
+    },
+
+        {
+            method: ['GET'],
+            path: '/api/domain/getall',
+            config: {
+                cors: true,
+                auth: { mode: 'required' },
+                plugins: { 'hapi-auth-cookie': { redirectTo: false } },
+            },
+            handler: (req, res) => {
+                if (req.auth.isAuthenticated) {
+                    const session = req.auth.credentials;
                     return new Promise((resolve, reject) => {
                         global.sqlite.run(`SELECT DOMAIN, PASSWORD, CREATED, MODIFIED FROM Psw WHERE USERID=('${session.id}')`, function (list) {
                             if (list.error)
@@ -63,12 +77,10 @@ module.exports = [
                         return res.response(JSON.stringify("An error occurred"));
                     })
                 }
-              }
-        },
-        
-    },
-    
+            }
+        }
 ]
+
 let encryptDom= (userId, domainClear) =>{
     return new Promise((resolve, reject) => {
         global.sqlite.run(`SELECT MASTERKEY as psw FROM User WHERE ID=('${userId}')`, function (result) {
