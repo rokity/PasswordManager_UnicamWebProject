@@ -6,7 +6,8 @@ module.exports = [
         path: '/api/register',
         config: {
             cors: true,
-            auth: { mode: 'try' },                     
+            auth: { mode: 'try' },
+            plugins: { 'hapi-auth-cookie': { redirectTo: false } },                     
         },
         handler: (req, res) => {
             var name = req.payload.name;
@@ -31,10 +32,7 @@ module.exports = [
                         } else reject(count.error);
                         })
                     }).then((val) => {
-                        console.log("insert done with id", val)
-                        var rows = global.sqlite.run(`SELECT * FROM User WHERE ID=${val}`);
-                        console.log("row created", rows);
-                        var account = {email:email,masterkey:val};
+                        var account = {email:email,id:val};
                         global.uuid = global.uuid+1;
                         const sid = String(global.uuid);
                         req.server.app.cache.set(sid, { account }, 0);

@@ -14,17 +14,17 @@ module.exports = [
             var email = req.payload.email;
             var masterkey = req.payload.masterkey;
             return new Promise((resolve, reject) => {
-                global.sqlite.run(`SELECT MASTERKEY as key FROM User WHERE EMAIL=('${email}')`, function (result) {
+                global.sqlite.run(`SELECT ID as id, MASTERKEY as key FROM User WHERE EMAIL=('${email}')`, function (result) {
                     if (result.error)
                         reject(result.error);
                     else {
-                        resolve(result[0].key);
+                        resolve(result);
                     }
                 });;
             }).then((val) => {
-                return bcrypt.compare(masterkey, val).then((value) => {
+                return bcrypt.compare(masterkey, val[0].key).then((value) => {
                     if (value) {
-                        var account = {email:email,masterkey:val};
+                        var account = {email:email,id:val[0].id};
                         global.uuid = global.uuid+1;
                         const sid = String(global.uuid);
                         req.server.app.cache.set(sid, { account }, 0);
