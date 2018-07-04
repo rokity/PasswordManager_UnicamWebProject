@@ -24,19 +24,19 @@ module.exports = [
             }).then((val) => {
                 return bcrypt.compare(masterkey, val[0].key).then((value) => {
                     if (value) {
-                        var account = {email:email,id:val[0].id};
-                        global.uuid = global.uuid+1;
+                        var account = { email: email, id: val[0].id };
+                        global.uuid = global.uuid + 1;
                         const sid = String(global.uuid);
                         req.server.app.cache.set(sid, { account }, 0);
                         req.cookieAuth.set({ sid });
-                        return res.response(JSON.stringify({logged:true}));
+                        return res.response(JSON.stringify({ logged: true }));
                     }
                     else {
-                        return res.response(JSON.stringify({logged:false}));                        
+                        return res.response(JSON.stringify({ logged: false }));
                     }
                 });
             }).catch(function (err) {
-                return res.response(JSON.stringify({logged:false}));
+                return res.response(JSON.stringify({ logged: false }));
             })
         },
     },
