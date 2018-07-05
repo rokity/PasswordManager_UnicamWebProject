@@ -8,44 +8,9 @@ const server = Hapi.server({
 });
 
 
-
-
-
 async function start() {
 
   try {
-    await server.register(require('hapi-auth-cookie'))
-    await server.register(Inert);
-    const cache = server.cache({ segment: 'sessions', expiresIn: 1 * 1 * 60 * 60 * 1000 });
-    server.app.cache = cache;
-    
-    server.auth.strategy('session', 'cookie', {
-      password: 'password-should-be-32-characters',
-      cookie: 'sid-example',
-      isHttpOnly: true,
-      keepAlive: true,
-      domain:'127.0.0.1',
-      path:'/login',
-      ttl: 1000*60*60,
-      isSameSite:'Strict',
-      redirectTo: 'http://localhost:4200/login',
-      isSecure: false,
-      validateFunc: async (request, session) => {
-
-        const cached = await cache.get(session.sid);
-        const out = {
-          valid: !!cached
-        };
-
-        if (out.valid) {
-          out.credentials = cached.account;
-        }
-
-        return out;
-      }
-    });
-
-    server.auth.default('session');
 
     //Lista di routes del web-server
     server.route(require('./routes'));
@@ -59,6 +24,9 @@ async function start() {
 
   console.log('DominKey Server running at:', server.info.uri);
 };
+
+//TOKEN ARRAY
+global.tokens = [];
 //DB Initialization
 try {
   sqlite.connect('./db/dominkey.enc',/*psw*/ 'dominkey', 'aes-256-cbc');

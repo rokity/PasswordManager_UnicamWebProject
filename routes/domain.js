@@ -7,12 +7,10 @@ module.exports = [
         path: '/api/domain/add',
         config: {
             cors: true,
-            auth: { mode: 'required' },
-            plugins: { 'hapi-auth-cookie': { redirectTo: false } },
         },
         handler: (req, res) => {
-            if (req.auth.isAuthenticated) {
-                const session = req.auth.credentials;
+             if (global.isAuthenticated(req.payload)) {
+                const session = global.tokens[eq.payload.token].account;
                 var domain = req.payload.domain;
                 var psw = req.payload.psw;
                 return new Promise((resolve, reject) => {
@@ -43,7 +41,7 @@ module.exports = [
                         return res.response(JSON.stringify({ DomainAdded: false, domainAlreadyInserted: false }));
                     }
                 })
-            }
+             }
         },
 
     },
@@ -53,12 +51,10 @@ module.exports = [
         path: '/api/domain/getall',
         config: {
             cors: true,
-            auth: { mode: 'required' },
-            plugins: { 'hapi-auth-cookie': { redirectTo: false } },
         },
         handler: (req, res) => {
-            if (req.auth.isAuthenticated) {
-                const session = req.auth.credentials;
+             if (global.isAuthenticated(req.query)) {
+                const session = global.tokens[req.query.token].account;
                 return new Promise((resolve, reject) => {
                     global.sqlite.run(`SELECT ID, DOMAIN, PASSWORD, CREATED, MODIFIED FROM Psw WHERE USERID=('${session.id}')`, function (list) {
                         if (list.error)
@@ -77,7 +73,7 @@ module.exports = [
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
                 })
-            }
+             }
         }
     },
 
@@ -86,12 +82,10 @@ module.exports = [
         path: '/api/domain/modify',
         config: {
             cors: true,
-            auth: { mode: 'required' },
-            plugins: { 'hapi-auth-cookie': { redirectTo: false } },
         },
         handler: (req, res) => {
-            if (req.auth.isAuthenticated) {
-                const session = req.auth.credentials;
+             if (global.isAuthenticated(req.payload)) {
+                const session = global.tokens[req.payload.token].account;
                 var domainID = req.payload.domainID;
                 var updatedPsw = req.payload.updatedPsw;
                 return new Promise((resolve, reject) => {
@@ -111,7 +105,7 @@ module.exports = [
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
                 })
-            }
+             }
         }
     },
     {
@@ -119,12 +113,9 @@ module.exports = [
         path: '/api/domain/delete',
         config: {
             cors: true,
-            auth: { mode: 'required' },
-            plugins: { 'hapi-auth-cookie': { redirectTo: false } },
         },
         handler: (req, res) => {
-            if (req.auth.isAuthenticated) {
-                const session = req.auth.credentials;
+             if (global.isAuthenticated(req.payload)) {
                 var domainID = req.payload.domainID;
                 return new Promise((resolve, reject) => {
                     global.sqlite.run(`DELETE FROM Psw WHERE ID=('${domainID}')`, function (row) {
@@ -140,7 +131,7 @@ module.exports = [
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
                 })
-            }
+             }
         }
     },
     {
@@ -148,15 +139,13 @@ module.exports = [
         path: '/api/domain/search',
         config: {
             cors: true,
-            auth: { mode: 'required' },
-            plugins: { 'hapi-auth-cookie': { redirectTo: false } },
         },
         handler: (req, res) => {
-            if (req.auth.isAuthenticated) {
-                const session = req.auth.credentials;
+            if (global.isAuthenticated(req.query)) {
+                const session = global.tokens[req.query.token].account;
                 var domain = req.query.domain;
                 return new Promise((resolve, reject) => {
-                    global.sqlite.run(`SELECT * FROM Psw WHERE DOMAIN=('${domain}')`, function (row) {
+                    global.sqlite.run(`SELECT * FROM Psw WHERE DOMAIN=('${domain}') AND USERID=('${session.id}')`, function (row) {
                         if (row.error)
                             reject(row.error);
                         else {
@@ -173,7 +162,7 @@ module.exports = [
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
                 })
-            }
+             }
         }
     }
 ]

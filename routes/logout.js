@@ -4,17 +4,13 @@ module.exports = [
         method: ['GET'],
         path: '/api/logout',
         config: {
-            cors: 
-            {
-                origin:['http://localhost:4200/'],
-                credentials: true,
-            },
-            auth: { mode: 'required' },            
+            cors: true,          
         },
         handler: (req,res) =>
         {
-
-            res.response(JSON.stringify(req.state['sid-example'].sid));
+            console.log(global.isAuthenticated(req.query))
+            delete global.tokens[req.query.token]
+            return res.response(JSON.stringify({removed:true}));
         }
     }
 ]

@@ -6,8 +6,6 @@ module.exports = [
         path: '/api/registation',
         config: {
             cors: true,
-            auth: { mode: 'try' },
-            plugins: { 'hapi-auth-cookie': { redirectTo: false } },
         },
         handler: (req, res) => {
             var name = req.payload.name;
@@ -32,11 +30,11 @@ module.exports = [
                         })
                     }).then((val) => {
                         var account = { email: email, id: val };
-                        global.uuid = global.uuid + 1;
-                        const sid = String(global.uuid);
-                        req.server.app.cache.set(sid, { account }, 0);
-                        req.cookieAuth.set({ sid });
-                        return res.response(JSON.stringify({ logged: true, mailUsed: false }));
+                        return global.tokenGenerator.then( token =>
+                            {
+                                global.tokens[token] = {account : account,expireDate :  global.expireDateGenerator()}
+                                return res.response(JSON.stringify({ logged: true, mailUsed: false,token: token }));
+                            })
                     }).catch(function (err) {
                         if (err.mailUtilizzata == true)
                             return res.response(JSON.stringify({ mailUsed: true, logged: false }));

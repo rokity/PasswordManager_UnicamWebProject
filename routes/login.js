@@ -1,17 +1,12 @@
 var bcrypt = require('bcrypt');
-
+var moment = require('moment')
 
 module.exports = [
     {
         method: ['POST'],
         path: '/api/login',
         config: {
-            cors: {
-                origin: ['*'],
-                credentials: true
-            },         
-            auth: { mode: 'try' },
-            plugins: { 'hapi-auth-cookie': { redirectTo: false } },
+            cors: true
         },
 
         handler: (req, res) => {
@@ -33,12 +28,12 @@ module.exports = [
                 return bcrypt.compare(masterkey, val[0].key).then((value) => {
                     if (value) {
                         var account = { email: email, id: val[0].id };
-                        global.uuid = global.uuid + 1;
-                        const sid = String(global.uuid);
-
-                        req.server.app.cache.set(sid, { account }, 0);
-                        req.cookieAuth.set({ sid });
-                        return res.response(JSON.stringify({ logged: true }));
+                        return global.tokenGenerator.then( token =>
+                        {
+                            global.tokens[token] = {account : account,expireDate :  global.expireDateGenerator()}
+                            return res.response(JSON.stringify({ logged: true, token: token }));
+                        })
+                        
                     }
                     else {
                         return res.response(JSON.stringify({ logged: false }));
@@ -50,3 +45,33 @@ module.exports = [
         },
     },
 ]
+
+global.tokenGenerator =  new Promise((resolve,reject)=>
+    {
+        require('crypto').randomBytes(48, function(err, buffer) {
+            var token = buffer.toString('hex');
+            resolve(token);
+          });
+    })
+    
+global.expireDateGenerator = () =>
+{
+    var data = moment();
+    data.add(1,'h')
+    return data;
+}
+
+global.isAuthenticated = (params) =>
+{
+    if(global.tokens.hasOwnProperty(params.token))
+        {
+           var expireDate=  global.tokens[params.token].expireDate;
+           var date = moment();
+           if(moment(date).isAfter(expireDate))
+                return false
+            else
+                return true;
+        }
+    else
+        return false;
+}
