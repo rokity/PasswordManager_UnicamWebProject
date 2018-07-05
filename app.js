@@ -4,7 +4,7 @@ var port = process.argv[2];
 
 const server = Hapi.server({
   host: 'localhost',
-  port: port
+  port: port,
 });
 
 
@@ -15,12 +15,19 @@ async function start() {
 
   try {
     await server.register(require('hapi-auth-cookie'))
+    await server.register(Inert);
     const cache = server.cache({ segment: 'sessions', expiresIn: 1 * 1 * 60 * 60 * 1000 });
     server.app.cache = cache;
-
+    
     server.auth.strategy('session', 'cookie', {
       password: 'password-should-be-32-characters',
       cookie: 'sid-example',
+      isHttpOnly: true,
+      keepAlive: true,
+      domain:'127.0.0.1',
+      path:'/login',
+      ttl: 1000*60*60,
+      isSameSite:'Strict',
       redirectTo: 'http://localhost:4200/login',
       isSecure: false,
       validateFunc: async (request, session) => {
