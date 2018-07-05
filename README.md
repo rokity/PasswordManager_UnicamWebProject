@@ -3,6 +3,7 @@ Backend side of Dominkey, website developed with the purpose of generating and s
 
 # Notes :
 * [Generate Password Library](https://github.com/brendanashworth/generate-password)
+* [Generate Password Library Angular](https://github.com/xama5/generate-password-browser)
 * [Bcrypt](https://www.npmjs.com/package/bcrypt) 
   Used to store and match securely masterkeys through this simple and slow hashing function.
 * [node-forge](https://www.npmjs.com/package/node-forge)
