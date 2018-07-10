@@ -10,9 +10,10 @@ module.exports = [
         },
         handler: (req, res) => {
              if (global.isAuthenticated(req.payload)) {
-                const session = global.tokens[eq.payload.token].account;
+                const session = global.tokens[req.payload.token].account;
                 var domain = req.payload.domain;
                 var psw = req.payload.psw;
+               
                 return new Promise((resolve, reject) => {
                     global.sqlite.run(`SELECT COUNT(*) as counter FROM Psw WHERE USERID='${session.id}' AND DOMAIN='${domain}'`, function (count) {
                         if (!count.error) {
@@ -42,6 +43,10 @@ module.exports = [
                     }
                 })
              }
+             else
+             {
+                return res.response(JSON.stringify({ Authenticated: false }));
+             }
         },
 
     },
@@ -68,17 +73,21 @@ module.exports = [
                         return decryptDom(session.id, list).then((clearlist) => {
                             return res.response(clearlist);
                         })
-                    } else return res.response(JSON.stringify("No domain insert in"));
+                    } else return res.response(JSON.stringify({domains:false}));
                 }).catch(function (err) {
                     console.log(err);
-                    return res.response(JSON.stringify("An error occurred"));
+                    return res.response(JSON.stringify({domains:false}));
                 })
+             }
+             else
+             {
+                return res.response(JSON.stringify({ Authenticated: false }));
              }
         }
     },
 
     {
-        method: ['PUT'],
+        method: ['POST'],
         path: '/api/domain/modify',
         config: {
             cors: true,
@@ -87,7 +96,7 @@ module.exports = [
              if (global.isAuthenticated(req.payload)) {
                 const session = global.tokens[req.payload.token].account;
                 var domainID = req.payload.domainID;
-                var updatedPsw = req.payload.updatedPsw;
+                var updatedPsw = req.payload.psw;
                 return new Promise((resolve, reject) => {
                     return encryptDom(session.id, updatedPsw).then((encrypted) => {
                     global.sqlite.run(`UPDATE Psw SET PASSWORD='${encrypted}', MODIFIED=DATETIME('now') WHERE ID=('${domainID}')`, function (row) {
@@ -106,10 +115,14 @@ module.exports = [
                     return res.response(JSON.stringify("An error occurred"));
                 })
              }
+             else
+             {
+                return res.response(JSON.stringify({ Authenticated: false }));
+             }
         }
     },
     {
-        method: ['DELETE'],
+        method: ['POST'],
         path: '/api/domain/delete',
         config: {
             cors: true,
@@ -131,6 +144,10 @@ module.exports = [
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
                 })
+             }
+             else
+             {
+                return res.response(JSON.stringify({ Authenticated: false }));
              }
         }
     },
@@ -162,6 +179,10 @@ module.exports = [
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
                 })
+             }
+             else
+             {
+                return res.response(JSON.stringify({ Authenticated: false }));
              }
         }
     }

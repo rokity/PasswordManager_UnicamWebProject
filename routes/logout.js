@@ -8,9 +8,13 @@ module.exports = [
         },
         handler: (req,res) =>
         {
-            console.log(global.isAuthenticated(req.query))
-            delete global.tokens[req.query.token]
-            return res.response(JSON.stringify({removed:true}));
+            if(global.isAuthenticated(req.query))
+                {
+                    delete global.tokens[req.query.token]
+                    return res.response(JSON.stringify({removed:true}));
+                }
+            else
+            return res.response(JSON.stringify({removed:false}));
         }
     }
 ]
