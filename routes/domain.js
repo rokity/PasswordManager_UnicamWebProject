@@ -61,7 +61,7 @@ module.exports = [
              if (global.isAuthenticated(req.query)) {
                 const session = global.tokens[req.query.token].account;
                 return new Promise((resolve, reject) => {
-                    global.sqlite.run(`SELECT ID, DOMAIN, PASSWORD, CREATED, MODIFIED FROM Psw WHERE USERID=('${session.id}')`, function (list) {
+                    global.sqlite.run(`SELECT ID, DOMAIN, CREATED, MODIFIED FROM Psw WHERE USERID=('${session.id}')`, function (list) {
                         if (list.error)
                             reject(list.error);
                         else {
