@@ -190,7 +190,7 @@ module.exports = [
                 const session = global.tokens[req.query.token].account;
                 var domain = req.query.domain;
                 return new Promise((resolve, reject) => {
-                    global.sqlite.run(`SELECT * FROM Psw WHERE DOMAIN=('${domain}') AND USERID=('${session.id}')`, function (row) {
+                    global.sqlite.run(`SELECT ID as id FROM Psw WHERE DOMAIN=('${domain}') AND USERID=('${session.id}')`, function (row) {
                         if (row.error)
                             reject(row.error);
                         else {
@@ -199,9 +199,7 @@ module.exports = [
                     });
                 }).then((row) => {
                     if (row.length > 0) {
-                        return decryptDom(session.id, row).then((decryptedRow) => {
-                            return res.response(decryptedRow);
-                        })
+                        return res.response(JSON.stringify({ foundDomain: true, domain: row}));
                     } else return res.response(JSON.stringify({ foundDomain: false }))
                 }).catch(function (err) {
                     console.log(err);
