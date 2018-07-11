@@ -1,19 +1,28 @@
 var forge = require('node-forge');
+const Joi = require('joi');
 
 
 module.exports = [
     {
         method: ['POST'],
         path: '/api/domain/add',
-        config: {
+        options: {
             cors: true,
+            validate: {
+                payload: {
+                    domain: Joi.string().required(),
+                    psw: Joi.string().required(),
+                    token: Joi.string().required()
+                }
+            }
         },
+
         handler: (req, res) => {
-             if (global.isAuthenticated(req.payload)) {
+            if (global.isAuthenticated(req.payload)) {
                 const session = global.tokens[req.payload.token].account;
                 var domain = req.payload.domain;
                 var psw = req.payload.psw;
-               
+
                 return new Promise((resolve, reject) => {
                     global.sqlite.run(`SELECT COUNT(*) as counter FROM Psw WHERE USERID='${session.id}' AND DOMAIN='${domain}'`, function (count) {
                         if (!count.error) {
@@ -42,11 +51,10 @@ module.exports = [
                         return res.response(JSON.stringify({ DomainAdded: false, domainAlreadyInserted: false }));
                     }
                 })
-             }
-             else
-             {
+            }
+            else {
                 return res.response(JSON.stringify({ authenticated: false }));
-             }
+            }
         },
 
     },
@@ -54,14 +62,19 @@ module.exports = [
     {
         method: ['GET'],
         path: '/api/domain/getall',
-        config: {
+        options: {
             cors: true,
+            validate: {
+                query: {
+                    token: Joi.string().required()
+                }
+            }
         },
         handler: (req, res) => {
-             if (global.isAuthenticated(req.query)) {
+            if (global.isAuthenticated(req.query)) {
                 const session = global.tokens[req.query.token].account;
                 return new Promise((resolve, reject) => {
-                    global.sqlite.run(`SELECT ID, DOMAIN, CREATED, MODIFIED FROM Psw WHERE USERID=('${session.id}')`, function (list) {
+                    global.sqlite.run(`SELECT ID as id, DOMAIN as domain, CREATED as created, MODIFIED as modified FROM Psw WHERE USERID=('${session.id}')`, function (list) {
                         if (list.error)
                             reject(list.error);
                         else {
@@ -71,62 +84,74 @@ module.exports = [
                 }).then((list) => {
                     if (list.length > 0) {
                         return res.response(list);
-                    } else return res.response(JSON.stringify({domains:false}));
+                    } else return res.response(JSON.stringify({ domains: false }));
                 }).catch(function (err) {
                     console.log(err);
-                    return res.response(JSON.stringify({domains:false}));
+                    return res.response(JSON.stringify({ domains: false }));
                 })
-             }
-             else
-             {
+            }
+            else {
                 return res.response(JSON.stringify({ authenticated: false }));
-             }
+            }
         }
     },
 
     {
-        method: ['POST'],
+        method: ['PUT'],
         path: '/api/domain/modify',
-        config: {
+        options: {
             cors: true,
+            validate: {
+                payload: {
+                    domainID: Joi.string().required(),
+                    updatedPsw: Joi.string().required(),
+                    token: Joi.string().required()
+                }
+            }
         },
         handler: (req, res) => {
-             if (global.isAuthenticated(req.payload)) {
+            if (global.isAuthenticated(req.payload)) {
                 const session = global.tokens[req.payload.token].account;
                 var domainID = req.payload.domainID;
                 var updatedPsw = req.payload.psw;
                 return new Promise((resolve, reject) => {
                     return encryptDom(session.id, updatedPsw).then((encrypted) => {
-                    global.sqlite.run(`UPDATE Psw SET PASSWORD='${encrypted}', MODIFIED=DATETIME('now') WHERE ID=('${domainID}')`, function (row) {
-                        if (row.error)
-                            reject(row.error);
-                        else {
-                            resolve(row);
-                        }
-                    });
-                })}).then((row) => {
-                    if(row.length>0){
-                     return res.response(JSON.stringify("Updated"));
+                        global.sqlite.run(`UPDATE Psw SET PASSWORD='${encrypted}', MODIFIED=DATETIME('now') WHERE ID=('${domainID}')`, function (row) {
+                            if (row.error)
+                                reject(row.error);
+                            else {
+                                resolve(row);
+                            }
+                        });
+                    })
+                }).then((row) => {
+                    if (row.length > 0) {
+                        return res.response(JSON.stringify("Updated"));
                     } else return res.response(JSON.stringify("Nothing to modify here"));
                 }).catch(function (err) {
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
                 })
-             }
-             else
-             {
+            }
+            else {
                 return res.response(JSON.stringify({ authenticated: false }));
-             }
+            }
         }
     },
     {
         method: ['POST'],
         path: '/api/domain/delete',
-        config: {
+        options: {
             cors: true,
+            validate: {
+                payload: {
+                    domainID: Joi.string().required(),
+                    token: Joi.string().required()
+                }
+            }
         },
         handler: (req, res) => {
-             if (global.isAuthenticated(req.payload)) {
+            if (global.isAuthenticated(req.payload)) {
                 var domainID = req.payload.domainID;
                 return new Promise((resolve, reject) => {
                     global.sqlite.run(`DELETE FROM Psw WHERE ID=('${domainID}')`, function (row) {
@@ -137,23 +162,28 @@ module.exports = [
                         }
                     });
                 }).then((row) => {
-                     return res.response(JSON.stringify("Deleted"));
+                    return res.response(JSON.stringify("Deleted"));
                 }).catch(function (err) {
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
                 })
-             }
-             else
-             {
+            }
+            else {
                 return res.response(JSON.stringify({ authenticated: false }));
-             }
+            }
         }
     },
     {
         method: ['GET'],
         path: '/api/domain/search',
-        config: {
+        options: {
             cors: true,
+            validate: {
+                query: {
+                    domain: Joi.string().required(),
+                    token: Joi.string().required()
+                }
+            }
         },
         handler: (req, res) => {
             if (global.isAuthenticated(req.query)) {
@@ -168,20 +198,19 @@ module.exports = [
                         }
                     });
                 }).then((row) => {
-                     if(row.length>0){
+                    if (row.length > 0) {
                         return decryptDom(session.id, row).then((decryptedRow) => {
                             return res.response(decryptedRow);
                         })
-                     } else return res.response(JSON.stringify("No password for this domain"))
+                    } else return res.response(JSON.stringify({ foundDomain: false }))
                 }).catch(function (err) {
                     console.log(err);
                     return res.response(JSON.stringify("An error occurred"));
                 })
-             }
-             else
-             {
+            }
+            else {
                 return res.response(JSON.stringify({ authenticated: false }));
-             }
+            }
         }
     }
 ]

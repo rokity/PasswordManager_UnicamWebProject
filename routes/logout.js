@@ -1,10 +1,17 @@
+const Joi = require('joi');
 
 module.exports = [
     {
         method: ['GET'],
         path: '/api/logout',
         config: {
-            cors: true,          
+            cors: true,
+            validate: {
+                query: {
+                    email: Joi.string().required(),
+                    masterkey: Joi.string().required()
+                }
+            }          
         },
         handler: (req,res) =>
         {

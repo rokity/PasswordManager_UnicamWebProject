@@ -1,4 +1,5 @@
 var bcrypt = require('bcrypt');
+const Joi = require('joi');
 
 module.exports = [
     {
@@ -6,6 +7,14 @@ module.exports = [
         path: '/api/registation',
         config: {
             cors: true,
+            validate: {
+                payload: {
+                    name: Joi.string().required(),
+                    surname: Joi.string().required(),
+                    email: Joi.string().required(),
+                    masterkey: Joi.string().required()
+                }
+            }
         },
         handler: (req, res) => {
             var name = req.payload.name;

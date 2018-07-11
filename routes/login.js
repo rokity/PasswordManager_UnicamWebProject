@@ -1,18 +1,24 @@
 var bcrypt = require('bcrypt');
-var moment = require('moment')
+var moment = require('moment');
+const Joi = require('joi');
 
 module.exports = [
     {
         method: ['POST'],
         path: '/api/login',
         config: {
-            cors: true
+            cors: true,
+            validate: {
+                payload: {
+                    email: Joi.string().required(),
+                    masterkey: Joi.string().required()
+                }
+            }
         },
 
         handler: (req, res) => {
-            var payload = JSON.parse(req.payload);
-            var email = payload.email;
-            var masterkey = payload.masterkey;
+            var email = req.payload.email;
+            var masterkey = req.payload.masterkey;
             return new Promise((resolve, reject) => {
                 global.sqlite.run(`SELECT ID as id, MASTERKEY as key FROM User WHERE EMAIL=('${email}')`, function (result) {
                     if (result.error) {
@@ -59,21 +65,15 @@ global.expireDateGenerator = () => {
 
 global.isAuthenticated = (params) => {
     //TODO: move token presence under BAD REQUEST response
-    if (params != null && global.tokens.hasOwnProperty.call(params, 'token')) {
-        var token = global.tokens[params.token];
-        if (token == undefined) {
-            return false;
-        } else {
-            var expireDate = token.expireDate;
-            var date = moment();
-            if (moment(date).isAfter(expireDate))
-                return false
-            else
-                return true;
-        }
-    }
-    else {
+    var token = global.tokens[params.token];
+    if (token == undefined) {
         return false;
-
+    } else {
+        var expireDate = token.expireDate;
+        var date = moment();
+        if (moment(date).isAfter(expireDate))
+            return false
+        else
+            return true;
     }
 }
