@@ -45,7 +45,7 @@ module.exports = [
              }
              else
              {
-                return res.response(JSON.stringify({ Authenticated: false }));
+                return res.response(JSON.stringify({ authenticated: false }));
              }
         },
 
@@ -70,9 +70,7 @@ module.exports = [
                     });;
                 }).then((list) => {
                     if (list.length > 0) {
-                        return decryptDom(session.id, list).then((clearlist) => {
-                            return res.response(clearlist);
-                        })
+                        return res.response(list);
                     } else return res.response(JSON.stringify({domains:false}));
                 }).catch(function (err) {
                     console.log(err);
@@ -81,7 +79,7 @@ module.exports = [
              }
              else
              {
-                return res.response(JSON.stringify({ Authenticated: false }));
+                return res.response(JSON.stringify({ authenticated: false }));
              }
         }
     },
@@ -117,7 +115,7 @@ module.exports = [
              }
              else
              {
-                return res.response(JSON.stringify({ Authenticated: false }));
+                return res.response(JSON.stringify({ authenticated: false }));
              }
         }
     },
@@ -147,7 +145,7 @@ module.exports = [
              }
              else
              {
-                return res.response(JSON.stringify({ Authenticated: false }));
+                return res.response(JSON.stringify({ authenticated: false }));
              }
         }
     },
@@ -182,7 +180,7 @@ module.exports = [
              }
              else
              {
-                return res.response(JSON.stringify({ Authenticated: false }));
+                return res.response(JSON.stringify({ authenticated: false }));
              }
         }
     }
