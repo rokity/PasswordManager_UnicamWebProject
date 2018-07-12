@@ -61,6 +61,47 @@ module.exports = [
 
     {
         method: ['GET'],
+        path: '/api/domain/get',
+        options: {
+            cors: true,
+            validate: {
+                query: {
+                    token: Joi.string().required(),
+                    domainID: Joi.string().required()
+                }
+            }
+        },
+        handler: (req, res) => {
+            if (global.isAuthenticated(req.query)) {
+                const session = global.tokens[req.query.token].account;
+                var domainId= req.query.domainID;
+                return new Promise((resolve, reject) => {
+                    global.sqlite.run(`SELECT PASSWORD FROM Psw WHERE USERID=('${session.id}') AND ID=('${domainId}')`, function (row) {
+                        if (row.error)
+                            reject(row.error);
+                        else {
+                            resolve(row);
+                        }
+                    });;
+                }).then((row) => {
+                    if (row.length > 0) {
+                        return decryptDom(session.id, row).then((decryptedRow) => {
+                            return res.response(decryptedRow);
+                        })
+                    } else return res.response(JSON.stringify({ domains: false }));
+                }).catch(function (err) {
+                    console.log(err);
+                    return res.response(JSON.stringify({ domains: false }));
+                })
+            }
+            else {
+                return res.response(JSON.stringify({ authenticated: false }));
+            }
+        }
+    },
+
+    {
+        method: ['GET'],
         path: '/api/domain/getall',
         options: {
             cors: true,
