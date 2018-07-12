@@ -138,14 +138,15 @@ module.exports = [
     },
 
     {
-        method: ['PUT'],
+        method: ['POST'],
         path: '/api/domain/modify',
         options: {
             cors: true,
             validate: {
                 payload: {
-                    domainID: Joi.string().required(),
-                    updatedPsw: Joi.string().required(),
+                    domain:Joi.string().required(),
+                    domainID: Joi.number().required(),
+                    psw: Joi.string().required(),
                     token: Joi.string().required()
                 }
             }
@@ -154,10 +155,11 @@ module.exports = [
             if (global.isAuthenticated(req.payload)) {
                 const session = global.tokens[req.payload.token].account;
                 var domainID = req.payload.domainID;
+                var domain = req.payload.domain;
                 var updatedPsw = req.payload.psw;
                 return new Promise((resolve, reject) => {
                     return encryptDom(session.id, updatedPsw).then((encrypted) => {
-                        global.sqlite.run(`UPDATE Psw SET PASSWORD='${encrypted}', MODIFIED=DATETIME('now') WHERE ID=('${domainID}')`, function (row) {
+                        global.sqlite.run(`UPDATE Psw SET DOMAIN='${domain}', PASSWORD='${encrypted}', MODIFIED=DATETIME('now') WHERE ID=('${domainID}')`, function (row) {
                             if (row.error)
                                 reject(row.error);
                             else {
@@ -186,7 +188,7 @@ module.exports = [
             cors: true,
             validate: {
                 payload: {
-                    domainID: Joi.string().required(),
+                    domainID: Joi.number().required(),
                     token: Joi.string().required()
                 }
             }
