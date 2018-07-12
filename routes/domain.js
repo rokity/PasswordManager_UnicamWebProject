@@ -159,7 +159,7 @@ module.exports = [
                 var updatedPsw = req.payload.psw;
                 return new Promise((resolve, reject) => {
                     return encryptDom(session.id, updatedPsw).then((encrypted) => {
-                        global.sqlite.run(`UPDATE Psw SET DOMAIN='${domain}', PASSWORD='${encrypted}', MODIFIED=DATETIME('now') WHERE ID=('${domainID}')`, function (row) {
+                        global.sqlite.run(`UPDATE Psw SET DOMAIN='${domain}', PASSWORD='${encrypted}', MODIFIED=DATETIME('now') WHERE ID=('${domainID}') AND USERID=('${session.id}')`, function (row) {
                             if (row.error)
                                 reject(row.error);
                             else {
@@ -195,9 +195,10 @@ module.exports = [
         },
         handler: (req, res) => {
             if (global.isAuthenticated(req.payload)) {
+                const session = global.tokens[req.payload.token].account;
                 var domainID = req.payload.domainID;
                 return new Promise((resolve, reject) => {
-                    global.sqlite.run(`DELETE FROM Psw WHERE ID=('${domainID}')`, function (row) {
+                    global.sqlite.run(`DELETE FROM Psw WHERE ID=('${domainID}') AND USERID=('${session.id}')`, function (row) {
                         if (row.error)
                             reject(row.error);
                         else {
