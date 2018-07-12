@@ -8,8 +8,7 @@ module.exports = [
             cors: true,
             validate: {
                 query: {
-                    email: Joi.string().required(),
-                    masterkey: Joi.string().required()
+                    token: Joi.string().required(),
                 }
             }          
         },
