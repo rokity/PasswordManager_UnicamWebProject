@@ -8,6 +8,7 @@ const server = Hapi.server({
 });
 
 
+
 async function start() {
 
   try {
@@ -15,6 +16,7 @@ async function start() {
     //Lista di routes del web-server
     server.route(require('./routes'));
 
+    await server.register([require('vision'), require('inert'), require('lout')]);
     server.start();
   }
   catch (err) {

@@ -13,11 +13,14 @@
   "dependencies": {
     "bcrypt": "^2.0.1",
     "hapi": "^17.5.2",
+    "inert": "^5.1.0",
     "joi": "^13.4.0",
+    "lout": "^11.0.1",
     "mkdirp": "^0.5.1",
     "moment": "^2.22.2",
     "node-forge": "^0.7.5",
     "nodemon": "^1.17.5",
-    "sqlite-cipher": "^0.3.6"
+    "sqlite-cipher": "^0.3.6",
+    "vision": "^5.3.3"
   }
 }
