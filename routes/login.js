@@ -13,6 +13,16 @@ module.exports = [
                     email: Joi.string().required(),
                     masterkey: Joi.string().required()
                 }
+            },
+            response: {
+                failAction: async (req, res, err) => { console.error("error", err); res.response({ error: err }) },
+                status: {
+                    200: Joi.object(
+                        {
+                            logged: Joi.boolean().required(),
+                            token: Joi.string().length(96)
+                        })
+                }
             }
         },
 
@@ -22,7 +32,7 @@ module.exports = [
             return new Promise((resolve, reject) => {
                 global.sqlite.run(`SELECT ID as id, MASTERKEY as key FROM User WHERE EMAIL=('${email}')`, function (result) {
                     if (result.error) {
-                        console.log(result.error)
+                        console.error("error",result.error)
                         reject(result.error);
                     }
                     else {

@@ -14,6 +14,17 @@ module.exports = [
                     psw: Joi.string().required(),
                     token: Joi.string().required()
                 }
+            },
+            response: {
+                failAction: async (req, res, err) => { console.error("error", err); res.response({ error: err }) },
+                status: {
+                    200: Joi.object(
+                        {
+                            DomainAdded: Joi.boolean().required(),
+                            domainAlreadyInserted: Joi.boolean().required(),
+                            authenticated: Joi.boolean().required(),
+                        })
+                }
             }
         },
 
@@ -42,13 +53,13 @@ module.exports = [
                         } else reject(count.error);
                     })
                 }).then((entry) => {
-                    return res.response(JSON.stringify({ DomainAdded: true, domainAlreadyInserted: false }));
+                    return res.response(JSON.stringify({ DomainAdded: true, domainAlreadyInserted: false, authenticated: true }));
                 }).catch(function (err) {
                     if (err.domainAlreadyInserted) {
-                        return res.response(JSON.stringify({ DomainAdded: false, domainAlreadyInserted: true }));
+                        return res.response(JSON.stringify({ DomainAdded: false, domainAlreadyInserted: true, authenticated: true }));
                     } else {
                         console.log(err);
-                        return res.response(JSON.stringify({ DomainAdded: false, domainAlreadyInserted: false }));
+                        return res.response(JSON.stringify({ DomainAdded: false, domainAlreadyInserted: false, authenticated: true }));
                     }
                 })
             }
@@ -69,12 +80,23 @@ module.exports = [
                     token: Joi.string().required(),
                     domainID: Joi.string().required()
                 }
+            },
+            response: {
+                failAction: async (req, res, err) => { console.error("error", err); res.response({ error: err }) },
+                status: {
+                    200: Joi.object(
+                        {
+                            password: Joi.string(),
+                            domain: Joi.boolean().required(),
+                            authenticated: Joi.boolean().required(),
+                        })
+                }
             }
         },
         handler: (req, res) => {
             if (global.isAuthenticated(req.query)) {
                 const session = global.tokens[req.query.token].account;
-                var domainId= req.query.domainID;
+                var domainId = req.query.domainID;
                 return new Promise((resolve, reject) => {
                     global.sqlite.run(`SELECT PASSWORD FROM Psw WHERE USERID=('${session.id}') AND ID=('${domainId}')`, function (row) {
                         if (row.error)
@@ -86,16 +108,16 @@ module.exports = [
                 }).then((row) => {
                     if (row.length > 0) {
                         return decryptDom(session.id, row).then((decryptedRow) => {
-                            return res.response(decryptedRow);
+                            return res.response(JSON.stringify({ authenticated: true, domain: true, password: decryptedRow[0]['PASSWORD'] }));
                         })
-                    } else return res.response(JSON.stringify({ domains: false }));
+                    } else return res.response(JSON.stringify({ domain: false, authenticated: true }));
                 }).catch(function (err) {
                     console.log(err);
-                    return res.response(JSON.stringify({ domains: false }));
+                    return res.response(JSON.stringify({ domain: false, authenticated: true }));
                 })
             }
             else {
-                return res.response(JSON.stringify({ authenticated: false }));
+                return res.response(JSON.stringify({ authenticated: false, domain: false }));
             }
         }
     },
@@ -108,6 +130,17 @@ module.exports = [
             validate: {
                 query: {
                     token: Joi.string().required()
+                }
+            },
+            response: {
+                failAction: async (req, res, err) => { console.error("error", err); res.response({ error: err }) },
+                status: {
+                    200: Joi.object(
+                        {
+                            password: Joi.string(),
+                            domains: [Joi.boolean(), Joi.array()],
+                            authenticated: Joi.boolean().required(),
+                        })
                 }
             }
         },
@@ -123,16 +156,17 @@ module.exports = [
                         }
                     });;
                 }).then((list) => {
-                    if (list.length > 0) {
-                        return res.response(list);
-                    } else return res.response(JSON.stringify({ domains: false }));
+                    if (list.length > 0)
+                        return res.response(JSON.stringify({ domains: list, authenticated: true }));
+                    else
+                        return res.response(JSON.stringify({ domains: false, authenticated: true }));
                 }).catch(function (err) {
                     console.log(err);
-                    return res.response(JSON.stringify({ domains: false }));
+                    return res.response(JSON.stringify({ domains: false, authenticated: true }));
                 })
             }
             else {
-                return res.response(JSON.stringify({ authenticated: false }));
+                return res.response(JSON.stringify({ authenticated: false, domains: false, }));
             }
         }
     },
@@ -144,10 +178,21 @@ module.exports = [
             cors: true,
             validate: {
                 payload: {
-                    domain:Joi.string().required(),
+                    domain: Joi.string().required(),
                     domainID: Joi.number().required(),
                     psw: Joi.string().required(),
                     token: Joi.string().required()
+                }
+            },
+            response: {
+                failAction: async (req, res, err) => { console.error("error", err); res.response({ error: err }) },
+                status: {
+                    200: Joi.object(
+                        {
+                            rows: Joi.number().required(),
+                            authenticated: Joi.boolean().required(),
+                            error:Joi.object()
+                        })
                 }
             }
         },
@@ -169,15 +214,15 @@ module.exports = [
                     })
                 }).then((row) => {
                     if (row.length > 0) {
-                        return res.response(JSON.stringify("Updated"));
-                    } else return res.response(JSON.stringify("Nothing to modify here"));
+                        return res.response({authenticated: true,rows:row.length});
+                    } else return res.response(JSON.stringify({authenticated: true,rows:0}));
                 }).catch(function (err) {
                     console.log(err);
-                    return res.response(JSON.stringify("An error occurred"));
+                    return res.response(JSON.stringify({error:err,authenticated: true,rows:0}));
                 })
             }
             else {
-                return res.response(JSON.stringify({ authenticated: false }));
+                return res.response(JSON.stringify({ authenticated: false,rows:0 }));
             }
         }
     },
@@ -190,6 +235,17 @@ module.exports = [
                 payload: {
                     domainID: Joi.number().required(),
                     token: Joi.string().required()
+                }
+            },
+            response: {
+                failAction: async (req, res, err) => { console.error("error", err); res.response({ error: err }) },
+                status: {
+                    200: Joi.object(
+                        {
+                            deleted: Joi.number().required(),
+                            authenticated: Joi.boolean().required(),
+                            error:Joi.object()
+                        })
                 }
             }
         },
@@ -206,14 +262,14 @@ module.exports = [
                         }
                     });
                 }).then((row) => {
-                    return res.response(JSON.stringify("Deleted"));
+                    return res.response({ authenticated: true,deleted:1 });
                 }).catch(function (err) {
                     console.log(err);
-                    return res.response(JSON.stringify("An error occurred"));
+                    return res.response(JSON.stringify({deleted:0 ,error:err,authenticated: true}));
                 })
             }
             else {
-                return res.response(JSON.stringify({ authenticated: false }));
+                return res.response(JSON.stringify({ deleted:0 ,authenticated: false }));
             }
         }
     },
@@ -226,6 +282,18 @@ module.exports = [
                 query: {
                     domain: Joi.string().required(),
                     token: Joi.string().required()
+                }
+            },
+            response: {
+                failAction: async (req, res, err) => { console.error("error", err); res.response({ error: err }) },
+                status: {
+                    200: Joi.object(
+                        {
+                            foundDomain: Joi.boolean(),
+                            authenticated: Joi.boolean().required(),
+                            domain:Joi.object(),
+                            error:Joi.object()
+                        })
                 }
             }
         },
@@ -243,11 +311,11 @@ module.exports = [
                     });
                 }).then((row) => {
                     if (row.length > 0) {
-                        return res.response(JSON.stringify({ foundDomain: true, domain: row}));
-                    } else return res.response(JSON.stringify({ foundDomain: false }))
+                        return res.response(JSON.stringify({ foundDomain: true, domain: row[0] ,authenticated: true}));
+                    } else return res.response(JSON.stringify({ foundDomain: false ,authenticated: true}))
                 }).catch(function (err) {
                     console.log(err);
-                    return res.response(JSON.stringify("An error occurred"));
+                    return res.response(JSON.stringify({ authenticated: true,error:err, }));
                 })
             }
             else {

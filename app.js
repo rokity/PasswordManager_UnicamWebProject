@@ -17,6 +17,7 @@ async function start() {
     server.route(require('./routes'));
 
     await server.register([require('vision'), require('inert'), require('lout')]);
+    
     server.start();
   }
   catch (err) {

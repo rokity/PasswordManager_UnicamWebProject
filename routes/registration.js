@@ -14,6 +14,17 @@ module.exports = [
                     email: Joi.string().required(),
                     masterkey: Joi.string().required()
                 }
+            },
+            response: {
+                failAction: async (req, res, err) => { console.error("error", err); res.response({ error: err }) },
+                status: {
+                    200: Joi.object(
+                        {
+                            logged: Joi.boolean().required(),
+                            mailUsed: Joi.boolean().required(),
+                            token: Joi.string().length(96)
+                        })
+                }
             }
         },
         handler: (req, res) => {
@@ -39,11 +50,10 @@ module.exports = [
                         })
                     }).then((val) => {
                         var account = { email: email, id: val };
-                        return global.tokenGenerator.then( token =>
-                            {
-                                global.tokens[token] = {account : account,expireDate :  global.expireDateGenerator()}
-                                return res.response(JSON.stringify({ logged: true, mailUsed: false,token: token }));
-                            })
+                        return global.tokenGenerator.then(token => {
+                            global.tokens[token] = { account: account, expireDate: global.expireDateGenerator() }
+                            return res.response(JSON.stringify({ logged: true, mailUsed: false, token: token }));
+                        })
                     }).catch(function (err) {
                         if (err.mailUtilizzata == true)
                             return res.response(JSON.stringify({ mailUsed: true, logged: false }));
