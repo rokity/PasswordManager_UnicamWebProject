@@ -4,7 +4,7 @@ const Joi = require('joi');
 
 module.exports = [
     {
-        method: ['PUT'],
+        method: ['POST'],
         path: '/api/domain/add',
         options: {
             cors: true,
