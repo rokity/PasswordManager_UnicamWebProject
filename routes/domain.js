@@ -4,7 +4,7 @@ const Joi = require('joi');
 
 module.exports = [
     {
-        method: ['POST'],
+        method: ['PUT'],
         path: '/api/domain/add',
         options: {
             cors: true,
@@ -172,7 +172,7 @@ module.exports = [
     },
 
     {
-        method: ['POST'],
+        method: ['PUT'],
         path: '/api/domain/modify',
         options: {
             cors: true,
@@ -227,12 +227,12 @@ module.exports = [
         }
     },
     {
-        method: ['POST'],
+        method: ['DELETE'],
         path: '/api/domain/delete',
         options: {
             cors: true,
             validate: {
-                payload: {
+                query: {
                     domainID: Joi.number().required(),
                     token: Joi.string().required()
                 }
@@ -250,9 +250,9 @@ module.exports = [
             }
         },
         handler: (req, res) => {
-            if (global.isAuthenticated(req.payload)) {
-                const session = global.tokens[req.payload.token].account;
-                var domainID = req.payload.domainID;
+            if (global.isAuthenticated(req.query)) {
+                const session = global.tokens[req.query.token].account;
+                var domainID = req.query.domainID;
                 return new Promise((resolve, reject) => {
                     global.sqlite.run(`DELETE FROM Psw WHERE ID=('${domainID}') AND USERID=('${session.id}')`, function (row) {
                         if (row.error)
