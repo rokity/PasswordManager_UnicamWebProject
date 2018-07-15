@@ -9,10 +9,10 @@ module.exports = [
             cors: true,
             validate: {
                 payload: {
-                    name: Joi.string().required(),
-                    surname: Joi.string().required(),
-                    email: Joi.string().required(),
-                    masterkey: Joi.string().required()
+                    name: Joi.string().max(15).required(),
+                    surname: Joi.string().max(15).required(),
+                    email: Joi.string().max(20).required(),
+                    masterkey: Joi.string().min(8).required()
                 }
             },
             response: {

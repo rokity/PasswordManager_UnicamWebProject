@@ -10,8 +10,8 @@ module.exports = [
             cors: true,
             validate: {
                 payload: {
-                    domain: Joi.string().required(),
-                    psw: Joi.string().required(),
+                    domain: Joi.string().max(40).required(),
+                    psw: Joi.string().max(30).required(),
                     token: Joi.string().required()
                 }
             },
@@ -178,9 +178,9 @@ module.exports = [
             cors: true,
             validate: {
                 payload: {
-                    domain: Joi.string().required(),
+                    domain: Joi.string().max(40).required(),
                     domainID: Joi.number().required(),
-                    psw: Joi.string().required(),
+                    psw: Joi.string().max(30).required(),
                     token: Joi.string().required()
                 }
             },
@@ -280,7 +280,7 @@ module.exports = [
             cors: true,
             validate: {
                 query: {
-                    domain: Joi.string().required(),
+                    domain: Joi.string().max(40).required(),
                     token: Joi.string().required()
                 }
             },
