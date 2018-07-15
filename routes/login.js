@@ -25,7 +25,6 @@ module.exports = [
                 }
             }
         },
-
         handler: (req, res) => {
             var email = req.payload.email;
             var masterkey = req.payload.masterkey;
