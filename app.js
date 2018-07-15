@@ -32,11 +32,17 @@ async function start() {
 global.tokens = [];
 //DB Initialization
 try {
-  sqlite.connect('./db/dominkey.enc',/*psw*/ 'dominkey', 'aes-256-cbc');
+  var readlineSync = require('readline-sync');
+  var pw = readlineSync.question('Inserisci password del database ', {
+    hideEchoBack: true // The typed text on screen is hidden by `*` (default).
+  });
+  sqlite.connect('./db/dominkey.enc',/*psw*/ pw, 'aes-256-cbc');
   console.log('Connected to the Dominkey database.');
   sqlite.run("CREATE TABLE IF NOT EXISTS User (ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME VARCHAR(15) NOT NULL, SURNAME VARCHAR(15) NOT NULL, EMAIL VARCHAR(20) NOT NULL, MASTERKEY VARCHAR NOT NULL);");
   sqlite.run("CREATE TABLE IF NOT EXISTS Psw (ID INTEGER PRIMARY KEY AUTOINCREMENT, DOMAIN VARCHAR(40) NOT NULL, PASSWORD VARCHAR(30) NOT NULL, USERID INTEGER NOT NULL, CREATED DATETIME DEFAULT CURRENT_TIMESTAMP, MODIFIED DATETIME);");
-}
+
+
+  }
 catch (error) {
   console.error("error", error)
 }
