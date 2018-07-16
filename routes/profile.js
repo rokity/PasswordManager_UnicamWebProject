@@ -64,6 +64,7 @@ module.exports = [
                     name: Joi.string().max(15).required(),
                     surname: Joi.string().max(15).required(),
                     email: Joi.string().max(20).required(),
+                    oldmasterkey: Joi.string().min(8).required(),
                     masterkey: Joi.string().min(8).required()
                 }
             },
@@ -72,10 +73,12 @@ module.exports = [
                 status: {
                     200: Joi.object(
                         {
-                            modified:Joi.boolean().required(),
-                            mailUsed:Joi.boolean().required(),
+                            modified: Joi.boolean().required(),
+                            matchold: Joi.boolean().required(),
+                            mailUsed: Joi.boolean().required(),
                             authenticated: Joi.boolean().required(),
-                            error:Joi.any()
+                            errordselect: Joi.any(),
+                            errordupdate: Joi.any()
                         })
                 }
             }
@@ -83,46 +86,59 @@ module.exports = [
         handler: (req, res) => {
             if (global.isAuthenticated(req.payload)) {
                 var id = global.tokens[req.payload.token].account['id'];
+                var oldmasterkey = req.payload.oldmasterkey;
                 var masterkey = req.payload.masterkey;
                 var name = req.payload.name;
                 var surname = req.payload.surname;
                 var email = req.payload.email;
-                return bcrypt.genSalt(10).then((salt) => {
-                    return bcrypt.hash(masterkey, salt).then((value) => {
-                        return new Promise((resolve, reject) => {
-                            global.sqlite.run(`SELECT COUNT(*) as counter FROM User WHERE EMAIL='${email}' AND ID !='${id}'`, function (count) {
-                                if (!count.error) {
-                                    if (count[0].counter > 0) {
-                                        reject({ mailUtilizzata: true });
-                                    } else global.sqlite.run(`UPDATE User SET NAME='${name}', SURNAME ='${surname}', EMAIL='${email}', MASTERKEY ='${value}' WHERE ID='${id}' `, function (row) {
-                                        if (row.error)
-                                            reject(row.error)
+                return new Promise((resolve, reject) => {
+                    global.sqlite.run(`SELECT MASTERKEY as key FROM User WHERE ID=('${id}')`, function (result) {
+                        if (result.error) {
+                            console.error("error", result.error)
+                            reject(result.error);
+                        }
+                        else {
+                            resolve(result);
+                        }
+                    });;
+                }).then((val) => {
+                    return bcrypt.compare(oldmasterkey, val[0].key).then((value) => {
+                        if (value) {
+                            return bcrypt.genSalt(10).then((salt) => {
+                                return bcrypt.hash(masterkey, salt).then((value) => {
+                                    return new Promise((resolve, reject) => {
+                                        global.sqlite.run(`SELECT COUNT(*) as counter FROM User WHERE EMAIL='${email}' AND ID !='${id}'`, function (count) {
+                                            if (!count.error) {
+                                                if (count[0].counter > 0) {
+                                                    reject({ mailUtilizzata: true });
+                                                } else global.sqlite.run(`UPDATE User SET NAME='${name}', SURNAME ='${surname}', EMAIL='${email}', MASTERKEY ='${value}' WHERE ID='${id}' `, function (row) {
+                                                    if (row.error)
+                                                        reject(row.error)
+                                                    else {
+                                                        resolve(row);
+                                                    }
+                                                });;
+                                            } else reject(count.error);
+                                        })
+                                    }).then((val) => {
+                                        var account = { email: email, id: id };
+                                        global.tokens[req.payload.token].account = account;
+                                        return res.response(JSON.stringify({ authenticated: true, matchold: true, modified: true, mailUsed: false }));
+                                    }).catch(function (err) {
+                                        if (err.mailUtilizzata == true)
+                                            return res.response(JSON.stringify({ authenticated: true, matchold: true, mailUsed: true, modified: false }));
                                         else {
-                                            resolve(row);
+                                            console.error(err)
+                                            return res.response(JSON.stringify({ matchold: true, authenticated: true, modified: false, mailUsed: false, errordupdate: err}));
                                         }
-                                    });;
-                                } else reject(count.error);
+                                    })
+                                })
                             })
-                        }).then((val) => {
-                            var account = { email: email, id: id };
-                            global.tokens[req.payload.token].account = account;
-                            return res.response(JSON.stringify({ authenticated: true, modified: true, mailUsed: false}));
-
-                        }).catch(function (err) {
-                            if (err.mailUtilizzata == true)
-                                return res.response(JSON.stringify({ authenticated: true,mailUsed: true, modified: false }));
-                            else
-                            {
-                                console.error(err)
-                                return res.response(JSON.stringify({ error:err,authenticated: true,modified: false, mailUsed: false }));
-                            }
-                        })
-                    })
-                })
-
+                        } else return res.response(JSON.stringify({ authenticated: true, matchold: false, modified: false, mailUsed: false }));
+                    });
+                }).catch(function (err) { return res.response(JSON.stringify({ authenticated: true, matchold: false, modified: false, mailUsed: false, errordselect: err}));})
             }
-            else {
-                return res.response(JSON.stringify({ authenticated: false ,modified:false}));
+            else {return res.response(JSON.stringify({ authenticated: false, matchold: false, modified: false, mailUsed: false }));
             }
         },
     }
