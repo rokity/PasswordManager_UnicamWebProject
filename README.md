@@ -1,9 +1,24 @@
-# DominKey Server
-Backend side of Dominkey, website developed with the purpose of generating and storing password securely for each site you want to. Conceived and developed by Riccardo Amadio and Alessandro Pacini at the University of Camerino.
+![alt text](https://github.com/Alepacox/ChromeExtension_PasswordManager_UnicamWebProject/blob/master/logo/dominKey_logo.png)
 
-# Notes :
-* [Generate Password Library](https://github.com/brendanashworth/generate-password)
-* [Generate Password Library Angular](https://github.com/xama5/generate-password-browser)
+# DominKey Server
+Backend side of DominKey, website developed with the purpose of generating and storing password securely for each site you want to. Conceived and developed by Riccardo Amadio and Alessandro Pacini at the University of Camerino.
+Realized with NodeJS, Hapi and Sqlite.
+## Installation
+```
+npm install
+```
+## Launch
+```
+npm start
+```
+At each start, it will ask for database password, decided at the first one.
+
+### DominKey repo
+* [Frontend](https://github.com/rokity/Frontend_PasswordManager_UnicamWebProject)
+  AngulaJS 6.0 and Bootstrap 4.1.
+* [Chrome Extension](https://github.com/Alepacox/ChromeExtension_PasswordManager_UnicamWebProject)
+
+#### Notes :
 * [Bcrypt](https://www.npmjs.com/package/bcrypt) 
   Used to store and match securely masterkeys through this simple and slow hashing function.
 * [node-forge](https://www.npmjs.com/package/node-forge)
