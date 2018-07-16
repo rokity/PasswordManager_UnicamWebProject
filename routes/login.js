@@ -11,7 +11,7 @@ module.exports = [
             validate: {
                 payload: {
                     email: Joi.string().max(20).required(),
-                    masterkey: Joi.string().required()
+                    masterkey: Joi.string().min(8).required()
                 }
             },
             response: {
