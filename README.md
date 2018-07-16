@@ -19,7 +19,6 @@ At each start, it will ask for database password, decided at the first one.
 * [Chrome Extension](https://github.com/Alepacox/ChromeExtension_PasswordManager_UnicamWebProject)
 
 #### Notes :
-* [Generate Password Library Angular](https://github.com/xama5/generate-password-browser)
 * [Bcrypt](https://www.npmjs.com/package/bcrypt) 
   Used to store and match securely masterkeys through this simple and slow hashing function.
 * [node-forge](https://www.npmjs.com/package/node-forge)
