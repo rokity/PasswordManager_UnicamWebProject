@@ -1,7 +1,7 @@
 ![alt text](https://github.com/Alepacox/ChromeExtension_PasswordManager_UnicamWebProject/blob/master/logo/dominKey_logo.png)
 
 # DominKey Server
-Backend side of Dominkey, website developed with the purpose of generating and storing password securely for each site you want to. Conceived and developed by Riccardo Amadio and Alessandro Pacini at the University of Camerino.
+Backend side of DominKey, website developed with the purpose of generating and storing password securely for each site you want to. Conceived and developed by Riccardo Amadio and Alessandro Pacini at the University of Camerino.
 
 ## Launch
 ```
