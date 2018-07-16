@@ -3,7 +3,10 @@
 # DominKey Server
 Backend side of DominKey, website developed with the purpose of generating and storing password securely for each site you want to. Conceived and developed by Riccardo Amadio and Alessandro Pacini at the University of Camerino.
 Realized with NodeJS, Hapi and Sqlite.
-
+## Installation
+```
+npm install
+```
 ## Launch
 ```
 npm start
