@@ -12,6 +12,8 @@ npm install
 npm start
 ```
 At each start, it will ask for database password, decided at the first one.
+## API Docs
+[API Docs](http://localhost:8000/docs) (Only after the server is launched)
 
 ### DominKey repo
 * [Frontend](https://github.com/rokity/Frontend_PasswordManager_UnicamWebProject)
