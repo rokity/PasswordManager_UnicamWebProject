@@ -335,9 +335,9 @@ let encryptDom = (userId, domainClear) => {
             }
         });;
     }).then((psw) => {
-        var salt = forge.random.getBytesSync(128);
+        var salt = forge.random.getBytesSync(256);
         var key = forge.pkcs5.pbkdf2(psw.substring(31, 60), salt, 10, 32);
-        var iv = forge.random.getBytesSync(16);
+        var iv = forge.random.getBytesSync(32);
         var cipher = forge.cipher.createCipher('AES-CBC', key);
         cipher.start({ iv: iv });
         cipher.update(forge.util.createBuffer(domainClear));
@@ -363,9 +363,9 @@ let decryptDom = (userId, domainEncrypted) => {
         domainEncrypted.forEach(function (row) {
             var decoded = forge.util.decode64(row.PASSWORD);
             var HashedMkey = psw.substring(31, 60);
-            var encryptedPsw = decoded.substring(144, row.PASSWORD.length);
-            var iv = decoded.substring(0, 16);
-            var salt = decoded.substring(16, 144);
+            var encryptedPsw = decoded.substring(288, row.PASSWORD.length);
+            var iv = decoded.substring(0, 32);
+            var salt = decoded.substring(32, 288);
             var key = forge.pkcs5.pbkdf2(HashedMkey, salt, 10, 32);
             var decipher = forge.cipher.createDecipher('AES-CBC', key);
             decipher.start({ iv: iv });
