@@ -31,7 +31,7 @@ module.exports = [
             return new Promise((resolve, reject) => {
                 global.sqlite.run(`SELECT ID as id, MASTERKEY as key FROM User WHERE EMAIL=('${email}')`, function (result) {
                     if (result.error) {
-                        console.error("error",result.error)
+                        console.error("error", result.error)
                         reject(result.error);
                     }
                     else {
@@ -42,7 +42,7 @@ module.exports = [
                 return bcrypt.compare(masterkey, val[0].key).then((value) => {
                     if (value) {
                         var account = { email: email, id: val[0].id };
-                        return global.tokenGenerator.then(token => {
+                        return global.tokenGenerator().then(token => {
                             global.tokens[token] = { account: account, expireDate: global.expireDateGenerator() }
                             return res.response(JSON.stringify({ logged: true, token: token }));
                         })
@@ -59,12 +59,15 @@ module.exports = [
     },
 ]
 
-global.tokenGenerator = new Promise((resolve, reject) => {
-    require('crypto').randomBytes(48, function (err, buffer) {
-        var token = buffer.toString('hex');
-        resolve(token);
-    });
-})
+global.tokenGenerator = () => {
+    return new Promise((resolve, reject) => {
+        require('crypto').randomBytes(48, function (err, buffer) {
+            var token = buffer.toString('hex');
+            resolve(token);
+        })
+    })
+
+}
 
 global.expireDateGenerator = () => {
     var data = moment();

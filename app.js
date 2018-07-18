@@ -15,7 +15,7 @@ async function start() {
 
     //Lista di routes del web-server
     server.route(require('./routes'));
-
+    //docs generator
     await server.register([require('vision'), require('inert'), require('lout')]);
     
     server.start();
