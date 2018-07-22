@@ -37,7 +37,7 @@ try {
   var pw = readlineSync.question('Inserisci password del database ', {
     hideEchoBack: true
   });
-  sqlite.connect('./db/dominkey.enc',/*psw*/ pw, 'aes-256-cbc');
+  sqlite.connect('./db/dominkey.enc', pw, 'aes-256-cbc');
   console.log('Connected to the Dominkey database.');
   sqlite.run("CREATE TABLE IF NOT EXISTS User (ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME VARCHAR NOT NULL, SURNAME VARCHAR NOT NULL, EMAIL VARCHAR NOT NULL, MASTERKEY VARCHAR NOT NULL);");
   sqlite.run("CREATE TABLE IF NOT EXISTS Psw (ID INTEGER PRIMARY KEY AUTOINCREMENT, DOMAIN VARCHAR NOT NULL, PASSWORD VARCHAR NOT NULL, USERID INTEGER NOT NULL, CREATED DATETIME DEFAULT CURRENT_TIMESTAMP, MODIFIED DATETIME);");

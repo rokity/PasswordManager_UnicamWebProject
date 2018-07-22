@@ -325,7 +325,7 @@ module.exports = [
     }
 ]
 
-let encryptDom = (userId, domainClear) => {
+global.encryptDom = (userId, domainClear) => {
     return new Promise((resolve, reject) => {
         global.sqlite.run(`SELECT MASTERKEY as psw FROM User WHERE ID=('${userId}')`, function (result) {
             if (result.error)
@@ -350,7 +350,7 @@ let encryptDom = (userId, domainClear) => {
         throw err;
     })
 }
-let decryptDom = (userId, domainEncrypted) => {
+global.decryptDom = (userId, domainEncrypted) => {
     return new Promise((resolve, reject) => {
         global.sqlite.run(`SELECT MASTERKEY as psw FROM User WHERE ID=('${userId}')`, function (result) {
             if (result.error)

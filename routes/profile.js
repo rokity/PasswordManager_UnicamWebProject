@@ -111,35 +111,94 @@ module.exports = [
                                             if (!count.error) {
                                                 if (count[0].counter > 0) {
                                                     reject({ mailUtilizzata: true });
-                                                } else global.sqlite.run(`UPDATE User SET NAME='${name}', SURNAME ='${surname}', EMAIL='${email}', MASTERKEY ='${value}' WHERE ID='${id}' `, function (row) {
-                                                    if (row.error)
-                                                        reject(row.error)
-                                                    else {
-                                                        resolve(row);
-                                                    }
-                                                });;
+                                                } else {
+                                                    resolve();
+                                                }
                                             } else reject(count.error);
                                         })
                                     }).then((val) => {
-                                        var account = { email: email, id: id };
-                                        global.tokens[req.payload.token].account = account;
-                                        return res.response(JSON.stringify({ authenticated: true, matchold: true, modified: true, mailUsed: false }));
+                                        return changeMasterKey(name, surname, email, value, id)
+                                        .then((result) => {
+                                            if (result){
+                                                var account = { email: email, id: id };
+                                                global.tokens[req.payload.token].account = account;
+                                                return res.response(JSON.stringify({ authenticated: true, matchold: true, modified: true, mailUsed: false }));
+                                            } else {
+                                                console.error(err)
+                                                return res.response(JSON.stringify({ matchold: true, authenticated: true, modified: false, mailUsed: false, errordupdate: err }));
+                                            }
+                                        }).catch((err) => {
+                                              console.error(err)
+                                              return res.response(JSON.stringify({ matchold: true, authenticated: true, modified: false, mailUsed: false, errordupdate: err }));
+                                        }
+                                    )
+
                                     }).catch(function (err) {
                                         if (err.mailUtilizzata == true)
                                             return res.response(JSON.stringify({ authenticated: true, matchold: true, mailUsed: true, modified: false }));
                                         else {
                                             console.error(err)
-                                            return res.response(JSON.stringify({ matchold: true, authenticated: true, modified: false, mailUsed: false, errordupdate: err}));
+                                            return res.response(JSON.stringify({ matchold: true, authenticated: true, modified: false, mailUsed: false, errordupdate: err }));
                                         }
                                     })
                                 })
                             })
                         } else return res.response(JSON.stringify({ authenticated: true, matchold: false, modified: false, mailUsed: false }));
                     });
-                }).catch(function (err) { return res.response(JSON.stringify({ authenticated: true, matchold: false, modified: false, mailUsed: false, errordselect: err}));})
+                }).catch(function (err) { return res.response(JSON.stringify({ authenticated: true, matchold: false, modified: false, mailUsed: false, errordselect: err })); })
             }
-            else {return res.response(JSON.stringify({ authenticated: false, matchold: false, modified: false, mailUsed: false }));
-            }
+            else return res.response(JSON.stringify({ authenticated: false, matchold: false, modified: false, mailUsed: false }));
+            
         },
     }
 ];
+
+let changeMasterKey = (name, surname, email, value, id) => {
+    return new Promise((resolve, reject) => {
+        global.sqlite.run(`SELECT ID, PASSWORD FROM Psw WHERE USERID=('${id}')`, function (result) {
+            if (result.error) {
+                console.log(result.error);
+                reject(result.error);
+            }
+            else {
+                resolve(result);
+            }
+        });
+    }).then((result) => {
+        if (result.length > 0) {
+            return global.decryptDom(id, result).then((decryptedRow) => {
+                return new Promise((resolve, reject) => {
+                    global.sqlite.run(`UPDATE User SET NAME='${name}', SURNAME ='${surname}', EMAIL='${email}', MASTERKEY ='${value}' WHERE ID='${id}'`, function (row) {
+                    if (row.error)
+                        reject(row.error)
+                    else resolve(row);
+                })
+            }).then(() => {
+                    decryptedRow.forEach(function (row) {
+                        return global.encryptDom(id, row.PASSWORD).then((encryptedPsw) => {
+                            return new Promise((resolve, reject) => {
+                                global.sqlite.run(`UPDATE Psw SET PASSWORD='${encryptedPsw}' WHERE ID=('${row.ID}')`, result => {
+                                    if (result.error) {
+                                        console.error("error", result.error)
+                                        reject(result.error);
+                                    }
+                                    else {
+                                        resolve(result);
+                                    }
+                                });
+                            }).catch((error) => {
+                                console.log(error);
+                                return false;
+                            });
+                        });
+                    });
+                    return true;
+                }
+                ).catch((err) => {
+                    console.log(err);
+                    return false;
+                })
+            })
+        }
+    })
+}
