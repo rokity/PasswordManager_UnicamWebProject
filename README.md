@@ -10,7 +10,7 @@ At each start, it will ask for database password, decided at the first time.
 ```
 npm install
 ```
-## Launch
+## Launch on localhost
 ```
 npm start
 ```
