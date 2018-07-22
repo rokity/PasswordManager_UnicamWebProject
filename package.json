@@ -8,8 +8,9 @@
   "private": true,
   "scripts": {
     "install": "node setup/dir.js",
-    "start": "node app.js 8000",
-    "dev": "nodemon app.js 8000"
+    "start": "node app.js 8000 localhost",
+    "dev": "nodemon app.js 8000 localhost",
+    "global": "node app.js 8000 0.0.0.0"
   },
   "dependencies": {
     "bcrypt": "^2.0.1",

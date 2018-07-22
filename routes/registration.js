@@ -50,6 +50,7 @@ module.exports = [
                         })
                     }).then((val) => {
                         var account = { email: email, id: val };
+                        //console.log("Nuovo utente registrato: "+name+" "+surname);
                         return global.tokenGenerator().then(token => {
                             global.tokens[token] = { account: account, expireDate: global.expireDateGenerator() }
                             return res.response(JSON.stringify({ logged: true, mailUsed: false, token: token }));

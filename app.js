@@ -1,9 +1,10 @@
 const Hapi = require('hapi');
 var sqlite = require('sqlite-cipher')
 var port = process.argv[2];
+var host= process.argv[3];
 
 const server = Hapi.server({
-  host: 'localhost',
+  host: host,
   port: port,
 });
 
